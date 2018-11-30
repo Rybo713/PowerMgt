@@ -8,6 +8,7 @@ PowerMgt is a command-line utilty that controls and moniters cpu governors and d
 The purpose of PowerMgt is to allow users to change their cpu governors and disk schedulers easily. 
 ## Requirements 
 `lscpu`
+
 `cpupower`
 
 ## Installation
