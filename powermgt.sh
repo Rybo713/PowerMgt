@@ -1,8 +1,8 @@
 #! /bin/bash
 # 
 #
-# PowerMgt: A command-line utilty that controls adn moniters cpu governors and disk schedulers written in bash 4.4.23+_
-# https://github.com/rybo173/PowerMgt
+# PowerMgt: A command-line utilty that controls adn moniters cpu governors and disk schedulers written in bash 4.4+_
+# https://github.com/Rybo173/PowerMgt
 #
 # The MIT License (MIT)
 #
@@ -173,9 +173,7 @@ fi
 # Not for users to see
 if [ $input = "fix" ]; then
    echo ""
-   echo "Need to Fix/Do"
-   echo "1. disk info"
-   echo "2. If no nvme / sata / hdd / fd / vd print error, else print out schedulers" 
-   echo "3. maybe return to script menu after finishing an option"
+   echo "Need to Fix/Do" 
+   echo "1. maybe return to script menu after finishing an option"
 fi
 
