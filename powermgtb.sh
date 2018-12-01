@@ -138,7 +138,7 @@ while true; do
 # Sets the console to 50x75
 printf '\033[8;50;75t'
 
-version="1.7beta"
+version="1.0.1beta"
 
 # Title
 printf "${YELLOW}"
@@ -149,7 +149,7 @@ echo "               / /_/ / __ \ | /| / / _ \/ ___/ /|_/ / __  / __/ "
 echo "              / ____/ /_/ / |/ |/ /  __/ /  / /  / / /_/ / /_   "
 echo "             /_/    \____/|__/|__/\___/_/  /_/  /_/\__, /\__/   "
 echo "                                                  /____/        "     
-echo "					           v$version 	      "
+echo "					        v$version 	      "
 echo "                             Ryan Wong 2018"
 printf "${YELLOW}"
 echo ""
