@@ -138,7 +138,7 @@ while true; do
 # Sets the console to 50x75
 printf '\033[8;50;75t'
 
-version="1.0.1beta"
+version="1.1.0beta"
 
 # Title
 printf "${YELLOW}"
@@ -171,21 +171,21 @@ echo ""
 # Checking disk info and figuring out which type of disk drive you're using
     if [[ -f "/sys/block/nvme0n1/queue/scheduler" ]]; then
 	printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
-	udevadm info --query=all --name=/dev/nvme0n1 | grep ID_SERIAL=
+	cat /sys/class/block/nvme0n1/device/model
 	printf "${BLUE}${bold}NVME: ${NC}${normal}"
         cat /sys/block/nvme0n1/queue/scheduler
     fi
 
     if [[ -f "/sys/block/sda/queue/scheduler" ]]; then
 	printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
-	udevadm info --query=all --name=/dev/sda | grep ID_SERIAL=
+	cat /sys/class/block/sda/device/model
 	printf "${BLUE}${bold}SATA: ${NC}${normal}"
         cat /sys/block/sda/queue/scheduler
     fi
 
     if [[ -f "/sys/block/hda/queue/scheduler" ]]; then
 	printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
-	udevadm info --query=all --name=/dev/hda | grep ID_SERIAL=
+	cat /sys/class/block/hda/device/model
 	printf "${BLUE}${bold}HDD: ${NC}${normal}"
         cat /sys/block/hda/queue/scheduler
     fi
@@ -194,13 +194,13 @@ echo ""
 echo ""
 
 # Options to change cpu governors and disk schedulers
-echo "OPTIONS:"
+printf "${bold}OPTIONS:${normal}"
 echo ""
-echo "CPU Governor:"
+echo "CPU Governors:"
 echo "1. Performance"
 echo "2. Powersave"
 echo ""
-echo "Disk Scheduler:"
+echo "Disk Schedulers:"
 echo "3. None"
 echo "4. MQ-Deadline"
 echo ""
