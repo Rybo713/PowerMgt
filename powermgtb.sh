@@ -294,6 +294,7 @@ if [ $OSID = "arch" ]; then
    printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package8 is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package8 is not installed\n"
+     exit 0
   fi
 
 elif [ $OSID = "alpine" ]; then
@@ -301,6 +302,7 @@ elif [ $OSID = "alpine" ]; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package8 is installed\n"
     else
        printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package8 is not installed\n"
+       exit 0
     fi
 
 elif [ $OSID = "ubuntu" ]; then
@@ -308,6 +310,7 @@ elif [ $OSID = "ubuntu" ]; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package8 is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package8 is not installed\n"
+     exit 0
   fi
 
 elif [ $OSID == "kali" ]; then
@@ -315,6 +318,7 @@ elif [ $OSID == "kali" ]; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package8 is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package8 is not installed\n"
+     exit 0
   fi
 
 elif [ $OSID = "LinuxMint" ]; then
@@ -322,6 +326,7 @@ elif [ $OSID = "LinuxMint" ]; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package8 is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package8 is not installed\n"
+     exit 0
   fi
 
 # Kubuntu
@@ -330,6 +335,7 @@ elif [ $OSID = "Ubuntu" ]; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package8 is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package8 is not installed\n"
+     exit 0
   fi
 
 elif [ $OSID = "centos" ]; then
@@ -337,6 +343,7 @@ elif [ $OSID = "centos" ]; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package8 is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package8 is not installed\n"
+     exit 0
   fi
 
 elif [ $OSID = "fedora" ]; then
@@ -344,6 +351,7 @@ elif [ $OSID = "fedora" ]; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package8 is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package8 is not installed\n"
+     exit 0
   fi
 
   else
@@ -368,7 +376,7 @@ while true; do
 # Sets the console to 50x75
 printf '\033[8;50;75t'
 
-version="1.3.1beta2"
+version="1.3.1beta3"
 
 # Title
 printf "${YELLOW}${bold}"
@@ -406,7 +414,7 @@ printf "${CYAN}${bold}Available CPU Governors: ${NC}${normal}"
 if [ $OSID = "fedora" ] || [ $OSID = "centos" ] || [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ]; then
   cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors
 elif [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ] || [ $OSID = "kali" ]; then
-  cpupower frequency-set --policy
+  cpupower frequency-info --policy
 else
   printf "${RED}${bold}[ERROR] Cannot find available CPU governors${NC}${normal}\n"
 fi
@@ -415,7 +423,7 @@ printf "${CYAN}${bold}Current CPU Governor: ${NC}${normal}"
 if [ $OSID = "fedora" ] || [ $OSID = "centos" ] || [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ]; then
   cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 elif [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ] || [ $OSID = "kali" ]; then
-  cpupower frequency-set --governor
+  cpupower frequency-info --governor
 else
   printf "${RED}${bold}[ERROR] Cannot find current CPU governor${NC}${normal}\n"
 fi
