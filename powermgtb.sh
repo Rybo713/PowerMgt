@@ -56,11 +56,13 @@ package=util-linux
 package2=kernel-tools
 package3=linux-tools-generic
 package4=linux-tools
+package5=linux-cpupower
 
 # Finds out distro os
 if [ -f /etc/os-release ]; then
     # freedesktop.org and systemd
     . /etc/os-release
+    OSID=$ID
     OS=$NAME
     VER=$VERSION_ID
  elif type lsb_release >/dev/null 2>&1; then
@@ -70,7 +72,7 @@ if [ -f /etc/os-release ]; then
  elif [ -f /etc/lsb-release ]; then
     # For some versions of Debian/Ubuntu without lsb_release command
     . /etc/lsb-release
-    OS=$DISTRIB_ID
+    OSID=$DISTRIB_ID
     VER=$DISTRIB_RELEASE
  elif [ -f /etc/debian_version ]; then
     # Older Debian/Ubuntu/etc.
@@ -79,7 +81,7 @@ if [ -f /etc/os-release ]; then
  elif [ -f /etc/SuSe-release ]; then
     # Older SuSE/etc.
     ...
- elif [ -f /etc/redhat-release ]; then
+ elif [ -f /etc/centos-release ]; then
     # Older Red Hat, CentOS, etc.
     ...
  else
@@ -91,56 +93,57 @@ fi
 echo "Checking system if it meets the requirements:"
 
 # Checks if the user has installed util-linux
-if [ $OS == "Arch" ]; then
+if [ $OSID = "arch" ]; then
   if pacman -Qs $package > /dev/null ; then
    printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
   fi
 
-elif [ $OS == "Alpine" ]; then
+elif [ $OSID = "alpine" ]; then
     if apk info $package > /dev/null ; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
     else
        printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
     fi
 
-elif [ $OS == "Ubuntu" ]; then
+elif [ $OSID = "ubuntu" ]; then
   if dpkg-query -W $package > /dev/null ; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
   fi
 
-elif [ $OS == "Kali" ] || [ $OS == "kali" ]; then
+elif [ $OSID == "kali" ]; then
   if dpkg-query -W $package > /dev/null ; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
   fi
 
-elif [ $OS == "Mint" ]; then
+elif [ $OSID = "LinuxMint" ]; then
   if dpkg-query -W $package > /dev/null ; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
   fi
 
-elif [ $OS == "Kubuntu" ]; then
+# Kubuntu
+elif [ $OSID = "Ubuntu" ]; then
   if dpkg-query -W $package > /dev/null ; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
   fi
 
-elif [ $OS == "RedHat" ]; then
+elif [ $OSID = "centos" ]; then
   if yum list installed "$package-*" > /dev/null ; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
   fi
 
-elif [ $OS == "Fedora" ]; then
+elif [ $OSID = "fedora" ]; then
   if yum list installed "$package-*" > /dev/null ; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
   else
@@ -148,12 +151,13 @@ elif [ $OS == "Fedora" ]; then
   fi
 
   else
+     clear
      printf "${RED}${bold}[ERROR] ${NC}${normal}Your OS is not supported at this time\n"
      exit 0
 fi
 
 # Checks if the user has installed kernel-tools
-if [ $OS == "Arch" ]; then
+if [ $OSID = "arch" ]; then
   if pacman -Qs $package2 > /dev/null ; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package2 is installed\n"
   else
@@ -161,13 +165,7 @@ if [ $OS == "Arch" ]; then
      exit 0
   fi
 
-  if pacman -Qs $package > /dev/null ; then
-   printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
-  else
-     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
-  fi
-
-elif [ $OS == "Alpine" ]; then
+elif [ $OSID = "alpine" ]; then
     if apk info $package4 > /dev/null ; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package4 is installed\n"
     else
@@ -175,7 +173,7 @@ elif [ $OS == "Alpine" ]; then
        exit 0
     fi
 
-elif [ $OS == "Ubuntu" ]; then
+elif [ $OSID = "ubuntu" ]; then
   if dpkg-query -W $package3 > /dev/null ; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package3 is installed\n"
   else
@@ -183,35 +181,40 @@ elif [ $OS == "Ubuntu" ]; then
      exit 0
   fi
 
-elif [ $OS == "Kali" ] || [ $OS == "kali" ]; then
+elif [ $OSID = "kali" ]; then
+  if dpkg-query -W $package5 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package5 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package5 is not installed\n"
+     exit 0
+  fi
+
+elif [ $OSID = "LinuxMint" ]; then
   if dpkg-query -W $package3 > /dev/null ; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package3 is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package3 is not installed\n"
+     exit 0
   fi
 
-elif [ $OS == "Mint" ]; then
+# Kubuntu
+elif [ $OSID = "Ubuntu" ]; then
   if dpkg-query -W $package3 > /dev/null ; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package3 is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package3 is not installed\n"
+     exit 0
   fi
 
-elif [ $OS == "Kubuntu" ]; then
-  if dpkg-query -W $package3 > /dev/null ; then
-     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package3 is installed\n"
-  else
-     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package3 is not installed\n"
-  fi
-
-elif [ $OS == "Red" ]; then
+elif [ $OSID = "centos" ]; then
   if yum list installed "$package2-*" > /dev/null ; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package2 is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package2 is not installed\n"
+     exit 0
   fi
 
-elif [ $OS == "Fedora" ]; then
+elif [ $OSID = "fedora" ]; then
   if yum list installed "$package2-*" > /dev/null ; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package2 is installed\n"
   else
@@ -226,7 +229,7 @@ while true; do
 # Sets the console to 50x75
 printf '\033[8;50;75t'
 
-version="1.2.1beta"
+version="1.3beta"
 
 # Title
 printf "${YELLOW}"
@@ -245,9 +248,9 @@ echo ""
 
 # Checking cpu, kernel, and distro info
 printf "${CYAN}${bold}CPU Info: ${NC}${normal}"
-if [ $OS = "Fedora" ] || [ $OS = "Red" ] || [ $OS = "Arch" ]; then
+if [ $OSID = "fedora" ] || [ $OSID = "centos" ] || [ $OSID = "arch" ]; then
   lscpu | sed -nr '/Model name/ s/.*:\s*(.*) @ .*/\1/p'
-elif [ $OS = "Ubuntu" ] || [ $OS = "Kubuntu" ] || [ $OS = "Mint" ] || [ $OS = "Alpine" ]; then
+elif [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ]; then
   lscpu | sed -nr '/Model name/ p'
 else
   printf "${RED}${bold}[ERROR] Cannot find CPU information${NC}${normal}\n"
@@ -262,13 +265,13 @@ echo ""
 
 # Checking available cpu governors and current cpu governors
 printf "${CYAN}${bold}Available CPU Governors: ${NC}${normal}"
-if [ $OS = "Fedora" ] || [ $OS = "Red" ] || [ $OS = "Arch" ] || [ $OS = "Ubuntu" ] || [ $OS = "Kubuntu" ] || [ $OS = "Mint" ] || [ $OS = "Alpine" ]; then
+if [ $OSID = "fedora" ] || [ $OSID = "centos" ] || [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ]; then
   cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors
 else
   printf "${RED}${bold}[ERROR] Cannot find available CPU governors${NC}${normal}\n"
 fi
 printf "${CYAN}${bold}Current CPU Governor: ${NC}${normal}"
-if [ $OS = "Fedora" ] || [ $OS = "Red" ] || [ $OS = "Arch" ] || [ $OS = "Ubuntu" ] || [ $OS = "Kubuntu" ] || [ $OS = "Mint" ] || [ $OS = "Alpine" ]; then
+if [ $OSID = "fedora" ] || [ $OSID = "centos" ] || [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ]; then
   cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 else
   printf "${RED}${bold}[ERROR] Cannot find current CPU governors${NC}${normal}\n"
@@ -382,13 +385,6 @@ fi
 if [ $input = "r" ] || [ $input = "refresh" ]; then
    clear
    printf "${GREEN}${bold}[INFO] ${NC}${normal}Refreshed info"
-fi
-
-# Not for users to see
-if [ $input = "fix" ]; then
-   clear
-   echo "Need to Fix/Do"
-   echo "[INFO] none right now"
 fi
 
 done
