@@ -1,5 +1,5 @@
 #! /bin/bash
-# 
+#
 #
 # PowerMgt: A command-line utilty that controls adn moniters cpu governors and disk schedulers written in bash 4.4+_
 # https://github.com/Rybo173/PowerMgt
@@ -26,26 +26,36 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Checks for root access
-if [[ $EUID -ne 0 ]]; then
-   echo "[ERROR] This script must be run as root" 
-   exit 1
-fi
-
 RED='\033[0;31m'
-LGREEN='\033[1;32m'
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[0;33m'
-CYAN='\033[0;36m'
 NC='\033[0m'
 
 bold=$(tput bold)
 normal=$(tput sgr0)
 
+# Checks for root access
+if [[ $EUID -ne 0 ]]; then
+printf "${RED}${bold}[ERROR] ${NC}${normal}This script must be run as root\n"
+   exit 1
+fi
+
+# Clears console
+clear
+
+LGREEN='\033[1;32m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+CYAN='\033[0;36m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+bold=$(tput bold)
+normal=$(tput sgr0)
 
 package=util-linux
 package2=kernel-tools
+package3=linux-tools-generic
+package4=linux-tools
 
 # Finds out distro os
 if [ -f /etc/os-release ]; then
@@ -78,10 +88,7 @@ if [ -f /etc/os-release ]; then
     VER=$(uname -r)
 fi
 
-# Clears console
-clear
-
-echo "Checking system if it meets the requirements:" 
+echo "Checking system if it meets the requirements:"
 
 # Checks if the user has installed util-linux
 if [ $OS == "Arch" ]; then
@@ -91,43 +98,124 @@ if [ $OS == "Arch" ]; then
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
   fi
 
+elif [ $OS == "Alpine" ]; then
+    if apk info $package > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
+    else
+       printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
+    fi
+
 elif [ $OS == "Ubuntu" ]; then
-  if apt list $package > /dev/null ; then
-   printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
+  if dpkg-query -W $package > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
+  fi
+
+elif [ $OS == "Kali" ] || [ $OS == "kali" ]; then
+  if dpkg-query -W $package > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
+  fi
+
+elif [ $OS == "Mint" ]; then
+  if dpkg-query -W $package > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
+  fi
+
+elif [ $OS == "Kubuntu" ]; then
+  if dpkg-query -W $package > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
+  fi
+
+elif [ $OS == "RedHat" ]; then
+  if yum list installed "$package-*" > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
   fi
 
 elif [ $OS == "Fedora" ]; then
   if yum list installed "$package-*" > /dev/null ; then
-   printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
   fi
+
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}Your OS is not supported at this time\n"
+     exit 0
 fi
 
 # Checks if the user has installed kernel-tools
 if [ $OS == "Arch" ]; then
   if pacman -Qs $package2 > /dev/null ; then
-   printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package2 is installed"
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package2 is installed\n"
   else
-     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package2 is not installed"
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package2 is not installed\n"
      exit 0
   fi
 
-elif [ $OS == "Ubuntu" ]; then
-  if apt list $package2 > /dev/null ; then
-   printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package2 is installed"
+  if pacman -Qs $package > /dev/null ; then
+   printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
   else
-     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package2 is not installed"
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
+  fi
+
+elif [ $OS == "Alpine" ]; then
+    if apk info $package4 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package4 is installed\n"
+    else
+       printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package4 is not installed\n"
+       exit 0
+    fi
+
+elif [ $OS == "Ubuntu" ]; then
+  if dpkg-query -W $package3 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package3 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package3 is not installed\n"
      exit 0
+  fi
+
+elif [ $OS == "Kali" ] || [ $OS == "kali" ]; then
+  if dpkg-query -W $package3 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package3 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package3 is not installed\n"
+  fi
+
+elif [ $OS == "Mint" ]; then
+  if dpkg-query -W $package3 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package3 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package3 is not installed\n"
+  fi
+
+elif [ $OS == "Kubuntu" ]; then
+  if dpkg-query -W $package3 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package3 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package3 is not installed\n"
+  fi
+
+elif [ $OS == "Red" ]; then
+  if yum list installed "$package2-*" > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package2 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package2 is not installed\n"
   fi
 
 elif [ $OS == "Fedora" ]; then
   if yum list installed "$package2-*" > /dev/null ; then
-   printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package2 is installed"
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package2 is installed\n"
   else
-     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package2 is not installed"
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package2 is not installed\n"
      exit 0
   fi
 fi
@@ -138,7 +226,7 @@ while true; do
 # Sets the console to 50x75
 printf '\033[8;50;75t'
 
-version="1.1.0beta"
+version="1.2.1beta"
 
 # Title
 printf "${YELLOW}"
@@ -148,45 +236,67 @@ echo "                / __ \____ _      _____  _____/  |/  /_____/ /_ "
 echo "               / /_/ / __ \ | /| / / _ \/ ___/ /|_/ / __  / __/ "
 echo "              / ____/ /_/ / |/ |/ /  __/ /  / /  / / /_/ / /_   "
 echo "             /_/    \____/|__/|__/\___/_/  /_/  /_/\__, /\__/   "
-echo "                                                  /____/        "     
+echo "                                                  /____/        "
 echo "					        v$version 	      "
 echo "                             Ryan Wong 2018"
 printf "${YELLOW}"
 echo ""
 echo ""
 
-# Checking cpu and kernel info and the current and available governors 
+# Checking cpu, kernel, and distro info
 printf "${CYAN}${bold}CPU Info: ${NC}${normal}"
-lscpu | sed -nr '/Model name/ s/.*:\s*(.*) @ .*/\1/p'
+if [ $OS = "Fedora" ] || [ $OS = "Red" ] || [ $OS = "Arch" ]; then
+  lscpu | sed -nr '/Model name/ s/.*:\s*(.*) @ .*/\1/p'
+elif [ $OS = "Ubuntu" ] || [ $OS = "Kubuntu" ] || [ $OS = "Mint" ] || [ $OS = "Alpine" ]; then
+  lscpu | sed -nr '/Model name/ p'
+else
+  printf "${RED}${bold}[ERROR] Cannot find CPU information${NC}${normal}\n"
+fi
+
 printf "${CYAN}${bold}Kernel Info: ${NC}${normal}"
 uname -r
 printf "${CYAN}${bold}Distro Info: ${NC}${normal}"
 echo "$OS $VER"
 echo ""
-cpupower frequency-info --policy
-cpupower frequency-info --governors
+echo ""
+
+# Checking available cpu governors and current cpu governors
+printf "${CYAN}${bold}Available CPU Governors: ${NC}${normal}"
+if [ $OS = "Fedora" ] || [ $OS = "Red" ] || [ $OS = "Arch" ] || [ $OS = "Ubuntu" ] || [ $OS = "Kubuntu" ] || [ $OS = "Mint" ] || [ $OS = "Alpine" ]; then
+  cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors
+else
+  printf "${RED}${bold}[ERROR] Cannot find available CPU governors${NC}${normal}\n"
+fi
+printf "${CYAN}${bold}Current CPU Governor: ${NC}${normal}"
+if [ $OS = "Fedora" ] || [ $OS = "Red" ] || [ $OS = "Arch" ] || [ $OS = "Ubuntu" ] || [ $OS = "Kubuntu" ] || [ $OS = "Mint" ] || [ $OS = "Alpine" ]; then
+  cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+else
+  printf "${RED}${bold}[ERROR] Cannot find current CPU governors${NC}${normal}\n"
+fi
 echo ""
 echo ""
 
 # Checking disk info and figuring out which type of disk drive you're using
     if [[ -f "/sys/block/nvme0n1/queue/scheduler" ]]; then
-	printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
-	cat /sys/class/block/nvme0n1/device/model
-	printf "${BLUE}${bold}NVME: ${NC}${normal}"
+	      printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
+	      cat /sys/class/block/nvme0n1/device/model
+	      printf "${BLUE}${bold}NVME: ${NC}${normal}"
         cat /sys/block/nvme0n1/queue/scheduler
     fi
 
     if [[ -f "/sys/block/sda/queue/scheduler" ]]; then
-	printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
-	cat /sys/class/block/sda/device/model
-	printf "${BLUE}${bold}SATA: ${NC}${normal}"
+        echo ""
+	      printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
+	      cat /sys/class/block/sda/device/model
+	      printf "${BLUE}${bold}SATA: ${NC}${normal}"
         cat /sys/block/sda/queue/scheduler
     fi
 
     if [[ -f "/sys/block/hda/queue/scheduler" ]]; then
-	printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
-	cat /sys/class/block/hda/device/model
-	printf "${BLUE}${bold}HDD: ${NC}${normal}"
+        echo ""
+	      printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
+	      cat /sys/class/block/hda/device/model
+	      printf "${BLUE}${bold}HDD: ${NC}${normal}"
         cat /sys/block/hda/queue/scheduler
     fi
 
@@ -277,9 +387,8 @@ fi
 # Not for users to see
 if [ $input = "fix" ]; then
    clear
-   echo "Need to Fix/Do" 
+   echo "Need to Fix/Do"
    echo "[INFO] none right now"
 fi
 
 done
-
