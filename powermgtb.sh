@@ -26,7 +26,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# Clears console
+clear
+
 RED='\033[0;31m'
+GREEN='\033[0;32m'
 NC='\033[0m'
 
 bold=$(tput bold)
@@ -34,12 +38,11 @@ normal=$(tput sgr0)
 
 # Checks for root access
 if [[ $EUID -ne 0 ]]; then
-printf "${RED}${bold}[ERROR] ${NC}${normal}This script must be run as root\n"
-   exit 1
+  printf "${RED}${bold}[ERROR] ${NC}${normal}This script must be run as root\n"
+  exit 1
+elif [[ $EUID -ne 1 ]]; then
+  printf "${GREEN}${bold}[INFO] ${NC}${normal}This script is running as root\n"
 fi
-
-# Clears console
-clear
 
 LGREEN='\033[1;32m'
 GREEN='\033[0;32m'
@@ -48,6 +51,7 @@ YELLOW='\033[0;33m'
 CYAN='\033[0;36m'
 RED='\033[0;31m'
 NC='\033[0m'
+LYELLOW='\033[1;33m'
 
 bold=$(tput bold)
 normal=$(tput sgr0)
@@ -57,6 +61,9 @@ package2=kernel-tools
 package3=linux-tools-generic
 package4=linux-tools
 package5=linux-cpupower
+package6=linux-tools-common
+package7=ruby
+package8=facter
 
 # Finds out distro os
 if [ -f /etc/os-release ]; then
@@ -90,7 +97,7 @@ if [ -f /etc/os-release ]; then
     VER=$(uname -r)
 fi
 
-echo "Checking system if it meets the requirements:"
+printf "${GREEN}${bold}[INFO] ${NC}${normal}Checking system if it meets the requirements\n"
 
 # Checks if the user has installed util-linux
 if [ $OSID = "arch" ]; then
@@ -158,10 +165,10 @@ fi
 
 # Checks if the user has installed kernel-tools
 if [ $OSID = "arch" ]; then
-  if pacman -Qs $package2 > /dev/null ; then
-     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package2 is installed\n"
+  if pacman -Qs $package4 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package4 is installed\n"
   else
-     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package2 is not installed\n"
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package4 is not installed\n"
      exit 0
   fi
 
@@ -190,10 +197,10 @@ elif [ $OSID = "kali" ]; then
   fi
 
 elif [ $OSID = "LinuxMint" ]; then
-  if dpkg-query -W $package3 > /dev/null ; then
-     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package3 is installed\n"
+  if dpkg-query -W $package6 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package6 is installed\n"
   else
-     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package3 is not installed\n"
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package6 is not installed\n"
      exit 0
   fi
 
@@ -223,13 +230,151 @@ elif [ $OSID = "fedora" ]; then
   fi
 fi
 
+# Checks if the user installed ruby
+if [ $OSID = "arch" ]; then
+  if pacman -Qs $package7 > /dev/null ; then
+   printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package7 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package7 is not installed\n"
+  fi
+
+elif [ $OSID = "alpine" ]; then
+    if apk info $package7 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package7 is installed\n"
+    else
+       printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package7 is not installed\n"
+    fi
+
+elif [ $OSID = "ubuntu" ]; then
+  if dpkg-query -W $package7 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package7 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package7 is not installed\n"
+  fi
+
+elif [ $OSID == "kali" ]; then
+  if dpkg-query -W $package7 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package7 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package7 is not installed\n"
+  fi
+
+elif [ $OSID = "LinuxMint" ]; then
+  if dpkg-query -W $package7 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package7 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package7 is not installed\n"
+  fi
+
+# Kubuntu
+elif [ $OSID = "Ubuntu" ]; then
+  if dpkg-query -W $package7 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package7 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package7 is not installed\n"
+  fi
+
+elif [ $OSID = "centos" ]; then
+  if yum list installed "$package7-*" > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package7 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package7 is not installed\n"
+  fi
+
+elif [ $OSID = "fedora" ]; then
+  if yum list installed "$package7-*" > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package7 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package7 is not installed\n"
+  fi
+
+  else
+     clear
+     printf "${RED}${bold}[ERROR] ${NC}${normal}Your OS is not supported at this time\n"
+     exit 0
+fi
+
+# Checks if the user has installed facter
+if [ $OSID = "arch" ]; then
+  if pacman -Qs $package8 > /dev/null ; then
+   printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package8 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package8 is not installed\n"
+  fi
+
+elif [ $OSID = "alpine" ]; then
+    if apk info $package8 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package8 is installed\n"
+    else
+       printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package8 is not installed\n"
+    fi
+
+elif [ $OSID = "ubuntu" ]; then
+  if dpkg-query -W $package8 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package8 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package8 is not installed\n"
+  fi
+
+elif [ $OSID == "kali" ]; then
+  if dpkg-query -W $package > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
+  fi
+
+elif [ $OSID = "LinuxMint" ]; then
+  if dpkg-query -W $package8 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package8 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package8 is not installed\n"
+  fi
+
+# Kubuntu
+elif [ $OSID = "Ubuntu" ]; then
+  if dpkg-query -W $package8 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package8 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package8 is not installed\n"
+  fi
+
+elif [ $OSID = "centos" ]; then
+  if yum list installed "$package8-*" > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package8 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package8 is not installed\n"
+  fi
+
+elif [ $OSID = "fedora" ]; then
+  if yum list installed "$package8-*" > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package8 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package8 is not installed\n"
+  fi
+
+  else
+     clear
+     printf "${RED}${bold}[ERROR] ${NC}${normal}Your OS is not supported at this time\n"
+     exit 0
+fi
+
+VM=$(facter virtual)
+
+# Checks if user is using virtual machine
+if [ $VM = "kvm" ]; then
+  printf "${LYELLOW}${bold}[WARN] ${NC}${normal}Running a virtual machine\n"
+  printf "${LYELLOW}${bold}[WARN] ${NC}${normal}Some features might not work\n"
+elif [ $VM = "physical" ]; then
+  printf "${GREEN}${bold}[INFO] ${NC}${normal}Running a physical machine\n"
+fi
+
 # Loop back to menu
 while true; do
 
 # Sets the console to 50x75
 printf '\033[8;50;75t'
 
-version="1.3beta"
+version="1.3.1beta"
 
 # Title
 printf "${YELLOW}"
@@ -267,14 +412,18 @@ echo ""
 printf "${CYAN}${bold}Available CPU Governors: ${NC}${normal}"
 if [ $OSID = "fedora" ] || [ $OSID = "centos" ] || [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ]; then
   cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors
+elif [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ]; then
+  cpupower frequency-set --policy
 else
   printf "${RED}${bold}[ERROR] Cannot find available CPU governors${NC}${normal}\n"
 fi
 printf "${CYAN}${bold}Current CPU Governor: ${NC}${normal}"
 if [ $OSID = "fedora" ] || [ $OSID = "centos" ] || [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ]; then
   cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+elif [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ]; then
+  cpupower frequency-set --governor
 else
-  printf "${RED}${bold}[ERROR] Cannot find current CPU governors${NC}${normal}\n"
+  printf "${RED}${bold}[ERROR] Cannot find current CPU governor${NC}${normal}\n"
 fi
 echo ""
 echo ""
