@@ -29,21 +29,6 @@
 # Clears console
 clear
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-NC='\033[0m'
-
-bold=$(tput bold)
-normal=$(tput sgr0)
-
-# Checks for root access
-if [[ $EUID -ne 0 ]]; then
-  printf "${RED}${bold}[ERROR] ${NC}${normal}This script must be run as root\n"
-  exit 1
-elif [[ $EUID -ne 1 ]]; then
-  printf "${GREEN}${bold}[INFO] ${NC}${normal}This script is running as root\n"
-fi
-
 LGREEN='\033[1;32m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -56,6 +41,15 @@ LYELLOW='\033[1;33m'
 bold=$(tput bold)
 normal=$(tput sgr0)
 
+# Checks for root access
+if [[ $EUID -ne 0 ]]; then
+  printf "${RED}${bold}[ERROR] ${NC}${normal}This script must be run as root\n"
+  exit 1
+elif [[ $EUID -ne 1 ]]; then
+  printf "${GREEN}${bold}[INFO] ${NC}${normal}This script is running as root\n"
+fi
+
+# PAckages that needs to be installed
 package=util-linux
 package2=kernel-tools
 package3=linux-tools-generic
@@ -317,10 +311,10 @@ elif [ $OSID = "ubuntu" ]; then
   fi
 
 elif [ $OSID == "kali" ]; then
-  if dpkg-query -W $package > /dev/null ; then
-     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package is installed\n"
+  if dpkg-query -W $package8 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package8 is installed\n"
   else
-     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package is not installed\n"
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package8 is not installed\n"
   fi
 
 elif [ $OSID = "LinuxMint" ]; then
@@ -374,10 +368,10 @@ while true; do
 # Sets the console to 50x75
 printf '\033[8;50;75t'
 
-version="1.3.1beta"
+version="1.3.1beta2"
 
 # Title
-printf "${YELLOW}"
+printf "${YELLOW}${bold}"
 echo ""
 echo "                 ____                          __  ___      __  "
 echo "                / __ \____ _      _____  _____/  |/  /_____/ /_ "
@@ -387,7 +381,6 @@ echo "             /_/    \____/|__/|__/\___/_/  /_/  /_/\__, /\__/   "
 echo "                                                  /____/        "
 echo "					        v$version 	      "
 echo "                             Ryan Wong 2018"
-printf "${YELLOW}"
 echo ""
 echo ""
 
@@ -395,7 +388,7 @@ echo ""
 printf "${CYAN}${bold}CPU Info: ${NC}${normal}"
 if [ $OSID = "fedora" ] || [ $OSID = "centos" ] || [ $OSID = "arch" ]; then
   lscpu | sed -nr '/Model name/ s/.*:\s*(.*) @ .*/\1/p'
-elif [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ]; then
+elif [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ] || [ $OSID = "kali" ]; then
   lscpu | sed -nr '/Model name/ p'
 else
   printf "${RED}${bold}[ERROR] Cannot find CPU information${NC}${normal}\n"
@@ -412,15 +405,16 @@ echo ""
 printf "${CYAN}${bold}Available CPU Governors: ${NC}${normal}"
 if [ $OSID = "fedora" ] || [ $OSID = "centos" ] || [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ]; then
   cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors
-elif [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ]; then
+elif [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ] || [ $OSID = "kali" ]; then
   cpupower frequency-set --policy
 else
   printf "${RED}${bold}[ERROR] Cannot find available CPU governors${NC}${normal}\n"
 fi
+
 printf "${CYAN}${bold}Current CPU Governor: ${NC}${normal}"
 if [ $OSID = "fedora" ] || [ $OSID = "centos" ] || [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ]; then
   cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-elif [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ]; then
+elif [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ] || [ $OSID = "kali" ]; then
   cpupower frequency-set --governor
 else
   printf "${RED}${bold}[ERROR] Cannot find current CPU governor${NC}${normal}\n"
@@ -429,28 +423,39 @@ echo ""
 echo ""
 
 # Checking disk info and figuring out which type of disk drive you're using
-    if [[ -f "/sys/block/nvme0n1/queue/scheduler" ]]; then
+if [[ -f "/sys/block/nvme0n1/queue/scheduler" ]]; then
 	      printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
 	      cat /sys/class/block/nvme0n1/device/model
 	      printf "${BLUE}${bold}NVME: ${NC}${normal}"
         cat /sys/block/nvme0n1/queue/scheduler
-    fi
 
-    if [[ -f "/sys/block/sda/queue/scheduler" ]]; then
+
+  elif [[ -f "/sys/block/sda/queue/scheduler" ]]; then
         echo ""
 	      printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
 	      cat /sys/class/block/sda/device/model
 	      printf "${BLUE}${bold}SATA: ${NC}${normal}"
         cat /sys/block/sda/queue/scheduler
-    fi
 
-    if [[ -f "/sys/block/hda/queue/scheduler" ]]; then
+
+  elif [[ -f "/sys/block/hda/queue/scheduler" ]]; then
         echo ""
 	      printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
 	      cat /sys/class/block/hda/device/model
 	      printf "${BLUE}${bold}HDD: ${NC}${normal}"
         cat /sys/block/hda/queue/scheduler
-    fi
+
+
+  elif [[ -f "/sys/block/vda/queue/scheduler" ]]; then
+        echo ""
+        printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
+        cat /sys/class/block/vda/device/model
+        printf "${BLUE}${bold}HDD: ${NC}${normal}"
+        cat /sys/block/vda/queue/scheduler
+    else
+      printf "${RED}${bold}[ERROR] ${NC}${normal}Cannot find disk information\n"
+fi
+
 
 echo ""
 echo ""
