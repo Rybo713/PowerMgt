@@ -8,15 +8,26 @@ PowerMgt is a command-line utilty that controls and moniters cpu governors and d
 The purpose of PowerMgt is to allow users to change their cpu governors and disk schedulers easily. 
 
 ## Requirements 
+
 `util-linux`
 
 `kernel-tools` or `linux-tools-generic` 
+
+`acpi`
+
+`ruby`
+
+`facter`
 
 ## Installation
 
 1. Git clone the repo.
   
   `git clone https://github.com/Rybo713/PowerMgt`
+  
+  or 
+  
+  Download the zip
 
 2. Change working directory to `PowerMgt`
    
@@ -29,3 +40,13 @@ The purpose of PowerMgt is to allow users to change their cpu governors and disk
 4. Run the script with root
    
    `sudo ./powermgt.sh`
+   
+## Supported Distros
+
+- Arch Linux
+- Fedora
+- CentOS
+- Ubuntu
+- Kubuntu
+- Kali Linux
+- Alpine Linux
