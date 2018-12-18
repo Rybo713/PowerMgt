@@ -48,5 +48,6 @@ The purpose of PowerMgt is to allow users to change their cpu governors and disk
 - CentOS
 - Ubuntu
 - Kubuntu
+- Linux Mint
 - Kali Linux
 - Alpine Linux
