@@ -101,6 +101,7 @@ package5=linux-cpupower
 package6=linux-tools-common
 package7=ruby
 package8=facter
+package9=acpi
 
 printf "${GREEN}${bold}[INFO] ${NC}${normal}Checking system if it meets the requirements\n"
 
@@ -231,6 +232,73 @@ elif [ $OSID = "fedora" ]; then
      printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package2 is installed\n"
   else
      printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package2 is not installed\n"
+     exit 0
+  fi
+fi
+
+# Checks if the user has installed acpi
+if [ $OSID = "arch" ]; then
+  if pacman -Qs $package9 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package9 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package9 is not installed\n"
+     exit 0
+  fi
+
+elif [ $OSID = "alpine" ]; then
+    if apk info $package9 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package9 is installed\n"
+    else
+       printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package9 is not installed\n"
+       exit 0
+    fi
+
+elif [ $OSID = "ubuntu" ]; then
+  if dpkg-query -W $package9 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package9 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package9 is not installed\n"
+     exit 0
+  fi
+
+elif [ $OSID = "kali" ]; then
+  if dpkg-query -W $package9 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package9 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package9 is not installed\n"
+     exit 0
+  fi
+
+elif [ $OSID = "LinuxMint" ]; then
+  if dpkg-query -W $package9 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package9 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package9 is not installed\n"
+     exit 0
+  fi
+
+# Kubuntu
+elif [ $OSID = "Ubuntu" ]; then
+  if dpkg-query -W $package9 > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package9 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package9 is not installed\n"
+     exit 0
+  fi
+
+elif [ $OSID = "centos" ]; then
+  if yum list installed "$package9-*" > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package9 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package9 is not installed\n"
+     exit 0
+  fi
+
+elif [ $OSID = "fedora" ]; then
+  if yum list installed "$package9-*" > /dev/null ; then
+     printf "${GREEN}${bold}[INFO] ${NC}${normal}The package $package9 is installed\n"
+  else
+     printf "${RED}${bold}[ERROR] ${NC}${normal}The package $package9 is not installed\n"
      exit 0
   fi
 fi
@@ -387,7 +455,7 @@ while true; do
 # Sets the console to 50x75
 printf '\033[8;50;75t'
 
-version="1.3.1rc"
+version="1.3.2rc"
 
 # Title
 printf "${YELLOW}${bold}"
@@ -417,6 +485,9 @@ printf "${CYAN}${bold}Kernel Info: ${NC}${normal}"
 uname -r
 printf "${CYAN}${bold}Distro Info: ${NC}${normal}"
 echo "$OS $VER"
+echo ""
+printf "${CYAN}${bold}Battery Info: ${NC}${normal}"
+acpi
 echo ""
 echo ""
 
@@ -586,4 +657,3 @@ fi
  fi
 
 done
-
