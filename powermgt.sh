@@ -26,8 +26,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# source ./progressbar.sh
+
 # Clears console
 clear
+
 
 # Finds out distro os
 if [ -f /etc/os-release ]; then
@@ -61,7 +64,7 @@ if [ -f /etc/os-release ]; then
     VER=$(uname -r)
 fi
 
-package9=ncurses
+package10=ncurses
 
 LGREEN='\033[1;32m'
 GREEN='\033[0;32m'
@@ -74,10 +77,10 @@ LYELLOW='\033[1;33m'
 
 if [ $OSID = "alpine" ]; then
     printf "${GREEN}[INFO] ${NC}Checking system if ncurses is installed for Alpine Linux\n"
-  if apk info $package9 > /dev/null ; then
-    printf "${GREEN}[INFO] ${NC}The package $package9 is installed\n"
+  if apk info $package10 > /dev/null ; then
+    printf "${GREEN}[INFO] ${NC}The package $package10 is installed\n"
   else
-    printf "${RED}[ERROR] ${NC}The package $package9 is not installed\n"
+    printf "${RED}[ERROR] ${NC}The package $package10 is not installed\n"
   fi
 fi
 
@@ -455,7 +458,7 @@ while true; do
 # Sets the console to 50x75
 printf '\033[8;50;75t'
 
-version="1.3.2rc"
+version="1.3.3rc"
 
 # Title
 printf "${YELLOW}${bold}"
@@ -470,7 +473,6 @@ echo "					        v$version 	      "
 echo "                             Ryan Wong 2018"
 echo ""
 echo ""
-
 # Checking cpu, kernel, and distro info
 printf "${CYAN}${bold}CPU Info: ${NC}${normal}"
 if [ $OSID = "fedora" ] || [ $OSID = "centos" ] || [ $OSID = "arch" ]; then
@@ -546,7 +548,7 @@ fi
 echo ""
 echo ""
 
-# Options to change cpu governors and disk schedulers
+# Options to change cpu governors, disk schedulers, and script settings
 printf "${bold}OPTIONS:${normal}"
 echo ""
 echo "CPU Governors:"
@@ -560,6 +562,7 @@ echo "5. Kyber"
 echo "6. BFQ"
 echo ""
 echo "Script Settings:"
+echo "c. clean info"
 echo "r. refresh"
 echo "a. about"
 echo "q. exit"
@@ -651,9 +654,147 @@ if [ $input = "r" ] || [ $input = "refresh" ]; then
    printf "${GREEN}${bold}[INFO] ${NC}${normal}Refreshed info"
 fi
 
- if [ $input = "a" ] || [ $input = "about" ]; then
+if [ $input = "a" ] || [ $input = "about" ]; then
    clear
    printf "${GREEN}${bold}[INFO] ${NC}${normal}PowerMgt v$version by Ryan Wong"
- fi
+fi
+
+# Clean Info
+if [ $input = "c" ]; then
+   clear
+   printf "${bold}PowerMgt v$version ${normal}\n"
+   printf "${CYAN}${bold}CPU Info: ${NC}${normal}"
+   if [ $OSID = "fedora" ] || [ $OSID = "centos" ] || [ $OSID = "arch" ]; then
+     lscpu | sed -nr '/Model name/ s/.*:\s*(.*) @ .*/\1/p'
+   elif [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ] || [ $OSID = "kali" ]; then
+     lscpu | sed -nr '/Model name/ p'
+   else
+     printf "${RED}${bold}[ERROR] Cannot find CPU information${NC}${normal}\n"
+   fi
+
+   printf "${CYAN}${bold}Kernel Info: ${NC}${normal}"
+   uname -r
+   printf "${CYAN}${bold}Distro Info: ${NC}${normal}"
+   echo "$OS $VER"
+   echo ""
+   printf "${CYAN}${bold}Battery Info: ${NC}${normal}"
+   acpi
+   echo ""
+   echo ""
+
+   printf "${CYAN}${bold}Current CPU Governor: ${NC}${normal}"
+   if [ $OSID = "fedora" ] || [ $OSID = "centos" ] || [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ]; then
+     cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+   elif [ $OSID = "arch" ] || [ $OSID = "ubuntu" ] || [ $OSID = "Ubuntu" ] || [ $OSID = "LinuxMint" ] || [ $OSID = "alpine" ] || [ $OSID = "kali" ]; then
+     cpupower frequency-info --governor
+   else
+     printf "${RED}${bold}[ERROR] Cannot find current CPU governor${NC}${normal}\n"
+   fi
+   echo ""
+   echo ""
+
+   # Checking disk info and figuring out which type of disk drive you're using
+   if [[ -f "/sys/block/nvme0n1/queue/scheduler" ]]; then
+   	      printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
+   	      cat /sys/class/block/nvme0n1/device/model
+   	      printf "${BLUE}${bold}NVME: ${NC}${normal}"
+          cat /sys/block/nvme0n1/queue/scheduler
+          echo ""
+          echo "Script Settings:"
+          echo "enter. return"
+          echo "e. exit"
+
+          read -p "> " input1
+
+          if [ $input1 = "e" ]; then
+            clear
+            echo "Goodbye!"
+            exit 0
+          fi
+
+          clear
+
+     elif [[ -f "/sys/block/sda/queue/scheduler" ]]; then
+           echo ""
+   	      printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
+   	      cat /sys/class/block/sda/device/model
+   	      printf "${BLUE}${bold}SATA: ${NC}${normal}"
+          cat /sys/block/sda/queue/scheduler
+          echo ""
+          echo "Script Settings:"
+          echo "enter. return"
+          echo "e. exit"
+
+          read -p "> " input2
+
+          if [ $input2 = "e" ]; then
+            clear
+            echo "Goodbye!"
+            exit 0
+          fi
+
+          clear
+
+     elif [[ -f "/sys/block/hda/queue/scheduler" ]]; then
+           echo ""
+   	      printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
+   	      cat /sys/class/block/hda/device/model
+   	      printf "${BLUE}${bold}HDD: ${NC}${normal}"
+          cat /sys/block/hda/queue/scheduler
+          echo ""
+          echo "Script Settings:"
+          echo "enter. return"
+          echo "e. exit"
+
+          read -p "> " input3
+
+          if [ $input3 = "e" ]; then
+            clear
+            echo "Goodbye!"
+            exit 0
+          fi
+
+          clear
+
+     elif [[ -f "/sys/block/vda/queue/scheduler" ]]; then
+           echo ""
+           printf "${CYAN}${bold}Disk Info: ${NC}${normal}"
+           cat /sys/class/block/vda/device/model
+           printf "${BLUE}${bold}HDD: ${NC}${normal}"
+           cat /sys/block/vda/queue/scheduler
+           echo ""
+           echo "Script Settings:"
+           echo "enter. return"
+           echo "e. exit"
+
+           read -p "> " input4
+
+           if [ $input4 = "e" ]; then
+             clear
+             echo "Goodbye!"
+             exit 0
+           fi
+
+           clear
+
+       else
+         printf "${RED}${bold}[ERROR] ${NC}${normal}Cannot find disk information\n"
+         echo ""
+         echo "Script Settings:"
+         echo "enter. return"
+         echo "e. exit"
+
+         read -p "> " input5
+
+         if [ $input5 = "e" ]; then
+           clear
+           echo "Goodbye!"
+           exit 0
+         fi
+
+         clear
+   fi
+
+fi
 
 done
